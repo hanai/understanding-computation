@@ -145,7 +145,36 @@ Assign.prototype = {
       return [DoNothing.new(), Object.assign({}, env, e)];
     }
   }
+};
+
+function If(condition, consequence, alternative) {
+  this.condition = condition;
+  this.consequence = consequence;
+  this.alternative = alternative;
 }
+
+If.prototype = {
+  reducible: true,
+  toString() {
+    const {condition, consequence, alternative} = this;
+    return `if (${condition}) { ${consequence} } else { ${alternative} }`;
+  },
+  inspect() {
+    return `«${this}»`;
+  },
+  reduce(env) {
+    const {condition, consequence, alternative} = this;
+    if (condition.reducible) {
+      return [If.new(condition.reduce(env), consequence, alternative), env];
+    } else {
+      if (condition.value === Boolean.new(true).value) {
+        return [consequence, env];
+      } else if (condition.value === Boolean.new(false).value) {
+        return [alternative, env];
+      }
+    }
+  }
+};
 
 function DoNothing() {
 }
@@ -157,11 +186,53 @@ DoNothing.prototype = {
   },
   inspect() {
     return `«${this}»`;
-  },
-  equal(state) {
-    return state instanceof DoNothing;
   }
+};
+
+function Sequence(first, second) {
+  this.first = first;
+  this.second = second;
 }
+
+Sequence.prototype = {
+  reducible: true,
+  toString() {
+    const {first, second} = this;
+    return `${first}; ${second}`;
+  },
+  inspect() {
+    return `«${this}»`;
+  },
+  reduce(env) {
+    const {first, second} = this;
+    if (first instanceof DoNothing) {
+      return [second, env];
+    } else {
+      const [reducedFirst, reducedEnv] = first.reduce(env);
+      return [Sequence.new(reducedFirst, second), reducedEnv];
+    }
+  }
+};
+
+function While(condition, body) {
+  this.condition = condition;
+  this.body = body;
+}
+
+While.prototype = {
+  reducible: true,
+  toString() {
+    const {condition, body} = this;
+    return `while (${condition}) { ${body} }`;
+  },
+  inspect() {
+    return `«${this}»`;
+  },
+  reduce(env) {
+    const {condition, body} = this;
+    return [If.new(condition, Sequence.new(body, this), DoNothing.new()), env];
+  }
+};
 
 function Machine(state, env) {
   this.state = state;
@@ -183,7 +254,7 @@ Machine.prototype = {
 
 [Number, Add, Multiply, Boolean,
   LessThan, Machine, Variable, Assign,
-  DoNothing].forEach(cls => {
+  If, DoNothing, Sequence, While].forEach(cls => {
     cls.new = function(...args) {
       return new cls(...args);
     };
@@ -195,8 +266,11 @@ module.exports = {
   Multiply,
   Boolean,
   LessThan,
+  Sequence,
   Variable,
   DoNothing,
   Assign,
+  If,
+  While,
   Machine
 };
