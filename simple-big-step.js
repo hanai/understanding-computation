@@ -1,30 +1,34 @@
-function Number(value) {
-  this.value = value;
-}
+class Number {
+  constructor(value) {
+    this.value = value;
+  }
 
-Number.prototype = {
   evalute(env) {
     return this;
-  },
+  }
+
   toString() {
     return this.value.toString();
-  },
+  }
+
   inspect() {
     return `«${this}»`;
   }
 }
 
-function Boolean(value) {
-  this.value = value;
-}
+class Boolean {
+  constructor(value) {
+    this.value = value;
+  }
 
-Boolean.prototype = {
   evalute(env) {
     return this;
-  },
+  }
+
   toString() {
     return this.value.toString();
-  },
+  }
+
   inspect() {
     return `«${this}»`;
   }
