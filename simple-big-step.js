@@ -34,79 +34,79 @@ class Boolean {
   }
 }
 
-function Variable(name) {
-  this.name = name;
-}
+class Variable {
+  constructor(name) {
+    this.name = name;
+  }
 
-Variable.prototype = {
   evalute(env) {
     return env[this.name];
   }
 }
 
-function Add(left, right) {
-  this.left = left;
-  this.right = right;
-}
+class Add {
+  constructor(left, right) {
+    this.left = left;
+    this.right = right;
+  }
 
-Add.prototype = {
   evalute(env) {
     const {left, right} = this;
     return Number.new(left.evalute(env).value + right.evalute(env).value);
   }
-};
-
-function Multiply(left, right) {
-  this.left = left;
-  this.right = right;
 }
 
-Multiply.prototype = {
+class Multiply {
+  constructor(left, right) {
+    this.left = left;
+    this.right = right;
+  }
+
   evalute(env) {
     const {left, right} = this;
     return Number.new(left.evalute(env).value * right.evalute(env).value);
   }
-};
-
-function LessThan(left, right) {
-  this.left = left;
-  this.right = right;
 }
 
-LessThan.prototype = {
+class LessThan {
+  constructor(left, right) {
+    this.left = left;
+    this.right = right;
+  }
+
   evalute(env) {
     const {left, right} = this;
     return Boolean.new(left.evalute(env).value < right.evalute(env).value);
   }
-};
-
-function Assign(name, exp) {
-  this.name = name;
-  this.exp = exp;
 }
 
-Assign.prototype = {
+class Assign {
+  constructor(name, exp) {
+    this.name = name;
+    this.exp = exp;
+  }
+
   evalute(env) {
     const {name, exp} = this;
     const e = {};
     e[name] = exp.evalute(env);
     return Object.assign({}, env, e);
   }
-};
-
-function DoNothing() {
 }
 
-DoNothing.prototype = {
+class DoNothing {
   evalute(env) {
     return env;
   }
-};
-
-function If(condition, consequence, alternative) {
 }
 
-If.prototype = {
+class If {
+  constructor(condition, consequence, alternative) {
+    this.condition = condition;
+    this.consequence = consequence;
+    this.alternative = alternative;
+  }
+
   evalute(env) {
     const {condition, consequence, alternative} = this;
     const res = condition.evalute(env);
@@ -116,19 +116,19 @@ If.prototype = {
       return alternative.evalute(env);
     }
   }
-};
-
-function Sequence(first, second) {
-  this.first = first;
-  this.second = second;
 }
 
-Sequence.prototype = {
+class Sequence {
+  constructor(first, second) {
+    this.first = first;
+    this.second = second;
+  }
+
   evalute(env) {
     const {first, second} = this;
     return second.evalute(first.evalute(env));
   }
-};
+}
 
 [Number, Boolean, Variable, Add,
   Multiply, LessThan, DoNothing, If,
