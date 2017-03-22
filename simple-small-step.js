@@ -43,20 +43,23 @@ class Add {
   }
 }
 
-function Multiply(left, right) {
-  this.left = left;
-  this.right = right;
-}
+class Multiply {
+  constructor(left, right) {
+    this.reducible = true;
 
-Multiply.prototype = {
-  reducible: true,
+    this.left = left;
+    this.right = right;
+  }
+
   toString() {
     const {left, right} = this;
     return `${left} * ${right}`;
-  },
+  }
+
   inspect() {
     return `«${this}»`;
-  },
+  }
+
   reduce(env) {
     const {left, right} = this;
     if (left.reducible) {
@@ -67,36 +70,41 @@ Multiply.prototype = {
       return Number.new(left.value * right.value);
     }
   }
-};
-
-function Boolean(value) {
-  this.value = value;
 }
 
-Boolean.prototype = {
-  reducible: false,
+class Boolean {
+  constructor(value) {
+    this.reducible = false;
+
+    this.value = value;
+  }
+
   toString() {
     return this.value.toString();
-  },
+  }
+
   inspect() {
     return `«${this}»`;
   }
-};
-
-function LessThan(left, right) {
-  this.left = left;
-  this.right = right;
 }
 
-LessThan.prototype = {
-  reducible: true,
+class LessThan {
+  constructor(left, right) {
+    this.reducible = true;
+
+    this.left = left;
+    this.right = right;
+  }
+
   toString() {
     const {left, right} = this;
     return `${left} < ${right}`;
-  },
+  }
+
   inspect() {
     return `«${this}»`;
-  },
+  }
+
   reduce(env) {
     const {left, right} = this;
     if (left.reducible) {
@@ -107,39 +115,45 @@ LessThan.prototype = {
       return Boolean.new(left.value < right.value);
     }
   }
-};
-
-function Variable(name) {
-  this.name = name;
 }
 
-Variable.prototype = {
-  reducible: true,
+class Variable {
+  constructor(name) {
+    this.reducible = true;
+
+    this.name = name;
+  }
+
   toString() {
     return this.name.toString();
-  },
+  }
+
   inspect() {
     return `«${this}»`;
-  },
+  }
+
   reduce(env) {
     return env[this.name];
   }
-};
-
-function Assign(name, exp) {
-  this.name = name;
-  this.exp = exp;
 }
 
-Assign.prototype = {
-  reducible: true,
+class Assign {
+  constructor(name, exp) {
+    this.reducible = true;
+
+    this.name = name;
+    this.exp = exp;
+  }
+
   toString() {
     const {name, exp} = this;
     return `${name} = ${exp}`;
-  },
+  }
+
   inspect() {
     return `«${this}»`;
-  },
+  }
+
   reduce(env) {
     const {name, exp} = this;
     if (exp.reducible) {
@@ -150,23 +164,26 @@ Assign.prototype = {
       return [DoNothing.new(), Object.assign({}, env, e)];
     }
   }
-};
-
-function If(condition, consequence, alternative) {
-  this.condition = condition;
-  this.consequence = consequence;
-  this.alternative = alternative;
 }
 
-If.prototype = {
-  reducible: true,
+class If {
+  constructor(condition, consequence, alternative) {
+    this.reducible = true;
+
+    this.condition = condition;
+    this.consequence = consequence;
+    this.alternative = alternative;
+  }
+
   toString() {
     const {condition, consequence, alternative} = this;
     return `if (${condition}) { ${consequence} } else { ${alternative} }`;
-  },
+  }
+
   inspect() {
     return `«${this}»`;
-  },
+  }
+
   reduce(env) {
     const {condition, consequence, alternative} = this;
     if (condition.reducible) {
@@ -179,35 +196,38 @@ If.prototype = {
       }
     }
   }
-};
-
-function DoNothing() {
 }
 
-DoNothing.prototype = {
-  reducible: false,
+class DoNothing {
+  constructor() {
+    this.reducible = false;
+  }
+
   toString() {
     return 'do-nothing';
-  },
+  }
   inspect() {
     return `«${this}»`;
   }
-};
-
-function Sequence(first, second) {
-  this.first = first;
-  this.second = second;
 }
 
-Sequence.prototype = {
-  reducible: true,
+class Sequence {
+  constructor(first, second) {
+    this.reducible = true;
+
+    this.first = first;
+    this.second = second;
+  }
+
   toString() {
     const {first, second} = this;
     return `${first}; ${second}`;
-  },
+  }
+
   inspect() {
     return `«${this}»`;
-  },
+  }
+
   reduce(env) {
     const {first, second} = this;
     if (first instanceof DoNothing) {
@@ -217,37 +237,41 @@ Sequence.prototype = {
       return [Sequence.new(reducedFirst, second), reducedEnv];
     }
   }
-};
-
-function While(condition, body) {
-  this.condition = condition;
-  this.body = body;
 }
 
-While.prototype = {
-  reducible: true,
+class While {
+  constructor(condition, body) {
+    this.reducible = true;
+
+    this.condition = condition;
+    this.body = body;
+  }
+
   toString() {
     const {condition, body} = this;
     return `while (${condition}) { ${body} }`;
-  },
+  }
+
   inspect() {
     return `«${this}»`;
-  },
+  }
+
   reduce(env) {
     const {condition, body} = this;
     return [If.new(condition, Sequence.new(body, this), DoNothing.new()), env];
   }
-};
-
-function Machine(state, env) {
-  this.state = state;
-  this.env = env;
 }
 
-Machine.prototype = {
+class Machine {
+  constructor(state, env) {
+    this.state = state;
+    this.env = env;
+  }
+
   step() {
     [this.state, this.env ] = this.state.reduce(this.env);
-  },
+  }
+
   run() {
     while (this.state.reducible) {
       console.log(`${this.state}, ${this.env}`);
@@ -255,7 +279,7 @@ Machine.prototype = {
     }
     console.log(`${this.state}, ${this.env}`);
   }
-};
+}
 
 [Number, Add, Multiply, Boolean,
   LessThan, Machine, Variable, Assign,
