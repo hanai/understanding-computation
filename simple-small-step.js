@@ -1,31 +1,36 @@
-function Number(value) {
-  this.value = value;
-}
+class Number {
+  constructor(value) {
+    this.reducible = false;
 
-Number.prototype = {
-  reducible: false,
+    this.value = value;
+  }
+
   toString() {
     return this.value.toString();
-  },
+  }
+
   inspect() {
     return `«${this}»`;
   }
-};
-
-function Add(left, right) {
-  this.left = left;
-  this.right = right;
 }
 
-Add.prototype = {
-  reducible: true,
+class Add {
+  constructor(left, right) {
+    this.reducible = true;
+
+    this.left = left;
+    this.right = right;
+  }
+
   toString() {
     const {left, right} = this;
     return `${left} + ${right}`;
-  },
+  }
+
   inspect() {
     return `«${this}»`;
-  },
+  }
+
   reduce(env) {
     const {left, right} = this;
     if (left.reducible) {
@@ -36,7 +41,7 @@ Add.prototype = {
       return Number.new(left.value + right.value);
     }
   }
-};
+}
 
 function Multiply(left, right) {
   this.left = left;
