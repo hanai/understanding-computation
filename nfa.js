@@ -8,7 +8,7 @@ class NFARulebook {
   }
 
   nextStates(states, character) {
-    return new Set(_.flatMap(states, state => {
+    return new Set(_.flatMap(Array.from(states), state => {
       return this.followRulesFor(state, character);
     }));
   }
@@ -22,7 +22,19 @@ class NFARulebook {
   }
 }
 
-[NFARulebook].forEach(cls => {
+class NFA {
+  constructor(currentStates, acceptsStates, rulebook) {
+    this.currentStates = currentStates;
+    this.acceptStates = acceptsStates;
+    this.rulebook = rulebook;
+  }
+
+  accepting() {
+    return !_.isEmpty(_.intersection(Array.from(this.currentStates), this.acceptStates));
+  }
+}
+
+[NFARulebook, NFA].forEach(cls => {
   cls.new = (...args) => {
     return new cls(...args);
   };
@@ -35,14 +47,17 @@ function test() {
           FARule.new(3, 'a', 4), FARule.new(3, 'b', 4)
         ]);
 
-  log(rulebook.nextStates([1], 'b')); // Set { [ 1, 2 ] }
-  log(rulebook.nextStates([1, 2], 'a')); // Set { [ 1, 3 ] }
-  log(rulebook.nextStates([1, 3], 'b')); // Set { [ 1, 2, 4 ] }
+  log(rulebook.nextStates(new Set([1]), 'b')); // Set { [ 1, 2 ] }
+  log(rulebook.nextStates(new Set([1, 2]), 'a')); // Set { [ 1, 3 ] }
+  log(rulebook.nextStates(new Set([1, 3]), 'b')); // Set { [ 1, 2, 4 ] }
+
+  log(NFA.new(new Set([1]), [4], rulebook).accepting()); // false
+  log(NFA.new(new Set([1, 2, 4]), [4], rulebook).accepting()); // true
 }
 
 test();
 
 module.exports = {
-  FARule,
+  NFA,
   NFARulebook
 };

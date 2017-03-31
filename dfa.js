@@ -1,8 +1,5 @@
 const FARule = require('./FARule');
-
-function log(...args) {
-  return console.log(...args);
-}
+const { log } = require('./utils');
 
 class DFARulebook {
   constructor(rules) {
