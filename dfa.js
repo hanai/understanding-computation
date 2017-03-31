@@ -1,25 +1,7 @@
+const FARule = require('./FARule');
+
 function log(...args) {
   return console.log(...args);
-}
-
-class FARule {
-  constructor(state, character, nextState) {
-    this.state = state;
-    this.character = character;
-    this.nextState = nextState;
-  }
-
-  appliesTo(state, character) {
-    return this.state === state && this.character === character;
-  }
-
-  follow() {
-    return this.nextState;
-  }
-
-  inspect() {
-    return `#<FARule ${this.state} --${this.character}--> ${this.nextState}`;
-  }
 }
 
 class DFARulebook {
@@ -80,7 +62,7 @@ class DFADesign {
   }
 }
 
-[FARule, DFARulebook, DFA, DFADesign].forEach(cls => {
+[DFARulebook, DFA, DFADesign].forEach(cls => {
   cls.new = function(...args) {
     return new cls(...args);
   };
