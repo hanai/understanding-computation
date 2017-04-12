@@ -32,9 +32,36 @@ class NFA {
   accepting() {
     return !_.isEmpty(_.intersection(Array.from(this.currentStates), this.acceptStates));
   }
+
+  readCharacter(character) {
+    this.currentStates = this.rulebook.nextStates(this.currentStates, character);
+  }
+
+  readString(string) {
+    string.split('').forEach(char => {
+      this.readCharacter(char);
+    });
+    return this;
+  }
 }
 
-[NFARulebook, NFA].forEach(cls => {
+class NFADesign {
+  constructor(startState, acceptStates, rulebook) {
+    this.startState = startState;
+    this.acceptStates = acceptStates;
+    this.rulebook = rulebook;
+  }
+
+  accepts(string) {
+    return this.toNFA().readString(string).accepting();
+  }
+
+  toNFA() {
+    return NFA.new(new Set([this.startState]), this.acceptStates, this.rulebook);
+  }
+}
+
+[NFARulebook, NFA, NFADesign].forEach(cls => {
   cls.new = (...args) => {
     return new cls(...args);
   };
@@ -53,11 +80,28 @@ function test() {
 
   log(NFA.new(new Set([1]), [4], rulebook).accepting()); // false
   log(NFA.new(new Set([1, 2, 4]), [4], rulebook).accepting()); // true
+
+  let nfa = NFA.new(new Set([1]), [4], rulebook);
+  nfa.readCharacter('b');
+  log(nfa.accepting()); // false
+  nfa.readCharacter('a');
+  log(nfa.accepting()); // false
+  nfa.readCharacter('b');
+  log(nfa.accepting()); // true
+  nfa = NFA.new(new Set([1]), [4], rulebook);
+  nfa.readString('bbbbb');
+  log(nfa.accepting()); // true
+
+  let nfaDesign = NFADesign.new(1, [4], rulebook);
+  log(nfaDesign.accepts('bab'));
+  log(nfaDesign.accepts('bbbbb'));
+  log(nfaDesign.accepts('bbabb'));
 }
 
 test();
 
 module.exports = {
   NFA,
-  NFARulebook
+  NFARulebook,
+  NFADesign
 };
