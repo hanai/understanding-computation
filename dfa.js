@@ -1,6 +1,12 @@
+/*
+ * 确定性有限自动机（Deterministic Finite Automaton，DFA）
+ * 确定性：不管它当前处于什么状态，并且不管读入什么字符，最终所处的状态总是完全确定的。
+ */
+
 const FARule = require('./FARule');
 const { log } = require('./utils');
 
+// 规则手册
 class DFARulebook {
   constructor(rules) {
     this.rules = rules;
@@ -26,6 +32,7 @@ class DFA {
     this.rulebook = rulebook;
   }
 
+  // 是否处于接受状态
   accepting() {
     return this.acceptStates.includes(this.currentState);
   }
