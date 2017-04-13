@@ -88,41 +88,9 @@ class DFADesign {
   }
 }
 
-function test() {
-  const rulebook = DFARulebook.new([
-    FARule.new(1, 'a', 2), FARule.new(1, 'b', 1),
-    FARule.new(2, 'a', 2), FARule.new(2, 'b', 3),
-    FARule.new(3, 'a', 3), FARule.new(3, 'b', 3)
-  ]);
-
-  log(rulebook.nextState(1, 'a')); // 2
-  log(rulebook.nextState(1, 'b')); // 1
-  log(rulebook.nextState(2, 'b')); // 3
-
-  log(DFA.new(1, [1, 3], rulebook).accepting()); // true
-  log(DFA.new(1, [3], rulebook).accepting()); // false
-
-  let dfa = DFA.new(1, [3], rulebook);
-  log(dfa.readCharacter('b').accepting()); // false
-  for (let i = 0; i < 3; i++) {
-    dfa.readCharacter('a');
-  }
-  log(dfa.accepting()); // false
-  log(dfa.readCharacter('b').accepting()); // true
-
-  dfa = DFA.new(1, [3], rulebook);
-  log(dfa.readString('baaab').accepting()); // true
-
-  let dfaDesign = DFADesign.new(1, [3], rulebook);
-  log(dfaDesign.accepts('a')); // false
-  log(dfaDesign.accepts('baa')); // false
-  log(dfaDesign.accepts('baba')); // true
-}
-
-test();
-
 export {
   FARule,
   DFARulebook,
-  DFA
+  DFA,
+  DFADesign
 };
