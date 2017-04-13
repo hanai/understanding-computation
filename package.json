@@ -1,7 +1,7 @@
 {
   "name": "understanding-computation",
   "scripts": {
-    "test": "tsc && ava dist/test.js"
+    "test": "tsc && ava ./dist/test/test.js"
   },
   "dependencies": {
     "@types/lodash": "^4.14.62",

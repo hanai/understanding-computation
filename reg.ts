@@ -192,33 +192,6 @@ class Repeat implements Pattern {
 
 applyMixins(Repeat, [Pattern]);
 
-function test() {
-  let pattern: Pattern = Repeat.new(
-    Choose.new(
-      Concatenate.new(Literal.new('a'), Literal.new('b')),
-      Literal.new('a')
-    )
-  );
-  log(pattern); // /(ab|a)*/
-  let nfaDesign = Empty.new().toNFADesign();
-  log(nfaDesign.accepts('')); // ture
-  log(nfaDesign.accepts('a')); // false
-  nfaDesign = Literal.new('a').toNFADesign();
-  log(nfaDesign.accepts('')); // false
-  log(nfaDesign.accepts('a')); // true
-  log(nfaDesign.accepts('b')); // false
-  log(Empty.new().matches('a')); // false
-  log(Literal.new('a').matches('a')); // true
-  pattern = Concatenate.new(Literal.new('a'),
-    Concatenate.new(Literal.new('b'), Literal.new('c')));
-  log(pattern);
-  log(pattern.matches('a')); // false
-  log(pattern.matches('ab')); // false
-  log(pattern.matches('abc')); // true
-}
-
-test();
-
 export {
   Pattern,
   Empty,
