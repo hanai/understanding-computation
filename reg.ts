@@ -159,7 +159,17 @@ class Choose implements Pattern {
   }
 
   toNFADesign() {
-    return NFADesign.new(1, [1], NFARulebook.new([]));
+    const firstNFADesign = this.first.toNFADesign();
+    const secondNFADesign = this.second.toNFADesign();
+
+    const startState = Object.create(null);
+    const acceptStates = firstNFADesign.acceptStates.concat(secondNFADesign.acceptStates);
+    const rules = firstNFADesign.rulebook.rules.concat(secondNFADesign.rulebook.rules);
+    const extraRules = [firstNFADesign, secondNFADesign].map(nfaDesign => {
+      return FARule.new(startState, null, nfaDesign.startState);
+    });
+    const rulebook = NFARulebook.new(rules.concat(extraRules));
+    return NFADesign.new(startState, acceptStates, rulebook);
   }
 }
 
@@ -186,7 +196,15 @@ class Repeat implements Pattern {
   }
 
   toNFADesign() {
-    return NFADesign.new(1, [1], NFARulebook.new([]));
+    const patternNFADesign = this.pattern.toNFADesign();
+    const startState = Object.create(null);
+    const acceptStates = patternNFADesign.acceptStates.concat([startState]);
+    const rules = patternNFADesign.rulebook.rules;
+    const extraRules = patternNFADesign.acceptStates.map(acceptState => {
+      return FARule.new(acceptState, null, patternNFADesign.startState);
+    }).concat([FARule.new(startState, null, patternNFADesign.startState)]);
+    const rulebook = NFARulebook.new(rules.concat(extraRules));
+    return NFADesign.new(startState, acceptStates, rulebook);
   }
 }
 
