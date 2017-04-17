@@ -1,6 +1,14 @@
+import * as _ from 'lodash';
+
 export default class SetExt<T> extends Set<T> {
   constructor(values?: T[] | Set<any>) {
     super(values);
+  }
+
+  equal(setB: Set<any>) {
+    const arrayA = Array.from(this);
+    const arrayB = Array.from(setB);
+    return _.isEqual(arrayA, arrayB);
   }
 
   intersection(setB: Set<any>) {
